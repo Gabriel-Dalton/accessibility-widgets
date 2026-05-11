@@ -1941,50 +1941,94 @@ const widgetStyles = `
   :host {
     all: initial;
     font-family: ${WIDGET_CONFIG.typography.fontFamily};
+
+    /* Design tokens — overridden by prefers-color-scheme below */
+    --snn-color-primary: ${WIDGET_CONFIG.colors.primary};
+    --snn-color-on-primary: ${WIDGET_CONFIG.colors.secondary};
+    --snn-color-menu-bg: #f4f4f6;
+    --snn-color-menu-border: rgba(0, 0, 0, 0.08);
+    --snn-color-option-bg: ${WIDGET_CONFIG.colors.optionBg};
+    --snn-color-option-text: ${WIDGET_CONFIG.colors.optionText};
+    --snn-color-option-icon: ${WIDGET_CONFIG.colors.optionIcon};
+    --snn-color-step-inactive: #d0d3d8;
+    --snn-color-focus-ring: ${WIDGET_CONFIG.colors.primary};
+    --snn-color-tooltip-bg: rgba(20, 22, 28, 0.92);
+    --snn-color-tooltip-text: #fff;
+    --snn-shadow-fab: 0 6px 16px rgba(0, 0, 0, 0.18), 0 2px 4px rgba(0, 0, 0, 0.12);
+    --snn-shadow-menu: 0 12px 32px rgba(0, 0, 0, 0.18);
+    --snn-radius-card: 12px;
+    --snn-radius-control: 10px;
+    --snn-anim-duration: 200ms;
+    --snn-anim-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --snn-fab-offset-bottom: max(${WIDGET_CONFIG.widgetPosition.bottom}, env(safe-area-inset-bottom, 0px));
+    --snn-fab-offset-side: max(${WIDGET_CONFIG.widgetPosition[WIDGET_CONFIG.widgetPosition.side]}, env(safe-area-inset-${WIDGET_CONFIG.widgetPosition.side}, 0px));
   }
-  
+
+  @media (prefers-color-scheme: dark) {
+    :host {
+      --snn-color-menu-bg: #15171c;
+      --snn-color-menu-border: rgba(255, 255, 255, 0.08);
+      --snn-color-option-bg: #1f232b;
+      --snn-color-option-text: #e7e9ee;
+      --snn-color-option-icon: #e7e9ee;
+      --snn-color-step-inactive: #3a3f47;
+      --snn-shadow-fab: 0 6px 16px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+      --snn-shadow-menu: 0 12px 32px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :host {
+      --snn-anim-duration: 0.01ms;
+    }
+  }
+
   * {
     box-sizing: border-box;
   }
-  
+
   #snn-accessibility-fixed-button {
     position: fixed !important;
-    ${WIDGET_CONFIG.widgetPosition.side}: ${WIDGET_CONFIG.widgetPosition[WIDGET_CONFIG.widgetPosition.side]} !important;
-    bottom: ${WIDGET_CONFIG.widgetPosition.bottom} !important;
+    ${WIDGET_CONFIG.widgetPosition.side}: var(--snn-fab-offset-side) !important;
+    bottom: var(--snn-fab-offset-bottom) !important;
     z-index: 9999;
-    background:${WIDGET_CONFIG.colors.primary};
-    padding:5px;
-    border-radius:100%;
+    background: var(--snn-color-primary);
+    padding: 5px;
+    border-radius: 100%;
   }
   
   #snn-accessibility-button {
-    background: ${WIDGET_CONFIG.colors.primary};
-    border: none;
+    background: var(--snn-color-primary);
+    border: solid 2px var(--snn-color-on-primary);
     border-radius: ${WIDGET_CONFIG.button.borderRadius};
     cursor: pointer;
     width: ${WIDGET_CONFIG.button.size};
     height: ${WIDGET_CONFIG.button.size};
-    box-shadow: ${WIDGET_CONFIG.button.shadow};
-    transition: ${WIDGET_CONFIG.animation.transition} !important;
+    box-shadow: var(--snn-shadow-fab);
+    transition: transform var(--snn-anim-duration) var(--snn-anim-ease), box-shadow var(--snn-anim-duration) var(--snn-anim-ease);
     display: flex;
     justify-content: center;
     align-items: center;
-    border:solid 2px white;
   }
-  
+
   #snn-accessibility-button:hover {
     transform: scale(${WIDGET_CONFIG.animation.hoverScale});
   }
-  
+
   #snn-accessibility-button:focus {
-    outline: 2px solid ${WIDGET_CONFIG.colors.secondary};
-    outline-offset: 2px;
+    outline: none;
   }
-  
+
+  #snn-accessibility-button:focus-visible {
+    outline: 3px solid var(--snn-color-focus-ring);
+    outline-offset: 3px;
+    box-shadow: var(--snn-shadow-fab), 0 0 0 4px var(--snn-color-on-primary);
+  }
+
   #snn-accessibility-button svg {
     width: ${WIDGET_CONFIG.button.iconSize};
     height: ${WIDGET_CONFIG.button.iconSize};
-    fill: ${WIDGET_CONFIG.colors.secondary};
+    color: var(--snn-color-on-primary);
     pointer-events: none;
   }
   
@@ -1993,45 +2037,69 @@ const widgetStyles = `
     top: 0;
     ${WIDGET_CONFIG.widgetPosition.side}: 0;
     max-width: ${WIDGET_CONFIG.widgetWidth};
-    width:100%;
+    width: 100%;
     height: 100vh;
+    height: 100dvh;
     overflow-y: auto;
-    background-color: #e2e2e2;
+    background-color: var(--snn-color-menu-bg);
+    color: var(--snn-color-option-text);
     padding: 0;
     display: none;
     font-family: ${WIDGET_CONFIG.typography.fontFamily};
     z-index: 999999;
     scrollbar-width: thin;
-    line-height:1 !important;
+    line-height: 1 !important;
+    box-shadow: var(--snn-shadow-menu);
+    transform: translateX(${WIDGET_CONFIG.widgetPosition.side === 'left' ? '-100%' : '100%'});
+    transition: transform var(--snn-anim-duration) var(--snn-anim-ease);
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
-  
+
+  #snn-accessibility-menu.snn-open {
+    transform: translateX(0);
+  }
+
   .snn-accessibility-option {
     font-size: ${WIDGET_CONFIG.menu.fontSize};
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
-    padding: 5px;
+    padding: 10px 5px;
     width: 100%;
-    background-color: ${WIDGET_CONFIG.colors.optionBg};
-    color: ${WIDGET_CONFIG.colors.optionText};
-    border: 3px solid ${WIDGET_CONFIG.colors.optionBg};
+    background-color: var(--snn-color-option-bg);
+    color: var(--snn-color-option-text);
+    border: 2px solid transparent;
     cursor: pointer;
-    border-radius: ${WIDGET_CONFIG.menu.borderRadius};
-    transition: background-color ${WIDGET_CONFIG.animation.transition}, border-color ${WIDGET_CONFIG.animation.transition};
+    border-radius: var(--snn-radius-card);
+    transition: background-color var(--snn-anim-duration) var(--snn-anim-ease),
+                border-color var(--snn-anim-duration) var(--snn-anim-ease),
+                transform var(--snn-anim-duration) var(--snn-anim-ease);
     line-height: ${WIDGET_CONFIG.typography.lineHeight} !important;
-    gap: 5px;
-    min-height: 105px;
+    gap: 6px;
+    min-height: 110px;
+    font-family: inherit;
   }
-  
+
   .snn-accessibility-option:hover {
-    border-color: ${WIDGET_CONFIG.colors.primary};
+    border-color: var(--snn-color-primary);
   }
-  
+
   .snn-accessibility-option.active {
-    border-color: ${WIDGET_CONFIG.colors.primary};
+    border-color: var(--snn-color-primary);
+    background-color: color-mix(in srgb, var(--snn-color-primary) 8%, var(--snn-color-option-bg));
   }
-  
+
+  .snn-accessibility-option:focus {
+    outline: none;
+  }
+
+  .snn-accessibility-option:focus-visible {
+    outline: 3px solid var(--snn-color-focus-ring);
+    outline-offset: 2px;
+    border-color: var(--snn-color-primary);
+  }
+
   .snn-accessibility-option:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -2040,23 +2108,25 @@ const widgetStyles = `
   .snn-icon {
     width: ${WIDGET_CONFIG.button.iconSize};
     height: ${WIDGET_CONFIG.button.iconSize};
-    fill: ${WIDGET_CONFIG.colors.optionIcon};
+    color: ${WIDGET_CONFIG.colors.optionIcon};
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
-  
+
   .snn-icon svg {
     width: 100%;
     height: 100%;
-    fill: currentColor;
   }
   
   .snn-button-text {
     text-align: center;
     line-height: 1.2;
-    font-size:16px;
+    font-size: 15px;
     font-weight: 600;
   }
-  
+
   .snn-option-steps {
     display: flex;
     gap: 5px;
@@ -2064,26 +2134,25 @@ const widgetStyles = `
     justify-content: center;
     margin-top: 5px;
   }
-  
+
   .snn-option-step {
-    width: 30px;
-    height: 6px;
+    width: 28px;
+    height: 5px;
     border-radius: 3px;
-    background-color: #d0d0d0;
-    transition: background-color ${WIDGET_CONFIG.animation.transition};
+    background-color: var(--snn-color-step-inactive);
+    transition: background-color var(--snn-anim-duration) var(--snn-anim-ease);
   }
-  
+
   .snn-option-step.active {
-    background-color: ${WIDGET_CONFIG.colors.primary};
+    background-color: var(--snn-color-primary);
   }
   
   .snn-close, .snn-reset-button {
     background: none;
     border: none;
-    font-size: ${WIDGET_CONFIG.menu.closeButtonSize};
     color: ${WIDGET_CONFIG.colors.secondary};
     cursor: pointer;
-    line-height: ${WIDGET_CONFIG.typography.lineHeight};
+    line-height: 1;
     border-radius: ${WIDGET_CONFIG.button.borderRadius};
     width: ${WIDGET_CONFIG.menu.closeButtonSize};
     height: ${WIDGET_CONFIG.menu.closeButtonSize};
@@ -2091,51 +2160,50 @@ const widgetStyles = `
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
   }
-  
-  .snn-close::before {
-    content: '×';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: ${WIDGET_CONFIG.menu.closeButtonSize};
-    line-height: 1;
-  }
-  
-  .snn-reset-button svg {
+
+  .snn-close svg, .snn-reset-button svg {
     width: 22px;
     height: 22px;
-    fill: ${WIDGET_CONFIG.colors.secondary};
+    pointer-events: none;
   }
   
   .snn-close:focus, .snn-reset-button:focus {
-    outline: solid 2px ${WIDGET_CONFIG.colors.secondary};
+    outline: none;
   }
-  
+
+  .snn-close:focus-visible, .snn-reset-button:focus-visible {
+    outline: 2px solid var(--snn-color-on-primary);
+    outline-offset: 2px;
+  }
+
   .snn-close:hover, .snn-reset-button:hover {
-    color: ${WIDGET_CONFIG.colors.secondary};
-    background: rgba(255, 255, 255, 0.2);
+    color: var(--snn-color-on-primary);
+    background: rgba(255, 255, 255, 0.18);
   }
-  
+
   /* Tooltip styles */
   .snn-tooltip {
     position: absolute;
-    bottom: -35px;
+    bottom: -36px;
     left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
+    transform: translateX(-50%) translateY(-4px);
+    background-color: var(--snn-color-tooltip-bg);
+    color: var(--snn-color-tooltip-text);
     padding: 6px 10px;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 12px;
+    font-weight: 500;
     white-space: nowrap;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity var(--snn-anim-duration) var(--snn-anim-ease),
+                transform var(--snn-anim-duration) var(--snn-anim-ease);
     z-index: 1000;
   }
-  
+
   .snn-tooltip::before {
     content: '';
     position: absolute;
@@ -2146,70 +2214,125 @@ const widgetStyles = `
     height: 0;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-bottom: 5px solid rgba(0, 0, 0, 0.8);
+    border-bottom: 5px solid var(--snn-color-tooltip-bg);
   }
-  
+
   .snn-close:hover .snn-tooltip,
-  .snn-close:focus .snn-tooltip,
+  .snn-close:focus-visible .snn-tooltip,
   .snn-reset-button:hover .snn-tooltip,
-  .snn-reset-button:focus .snn-tooltip {
+  .snn-reset-button:focus-visible .snn-tooltip {
     opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
-  
+
   .snn-header {
     display: flex;
     align-items: center;
-    padding: 10px;
-    background: ${WIDGET_CONFIG.colors.primary};
+    padding: 10px 14px;
+    background: var(--snn-color-primary);
     height: ${WIDGET_CONFIG.menu.headerHeight};
     position: sticky;
     top: 0;
     z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     gap: 8px;
+    padding-top: max(10px, env(safe-area-inset-top, 0px));
   }
-  
+
   .snn-content {
-    padding: 20px 20px 0px 20px;
+    padding: 20px 20px 20px 20px;
   }
-  
+
   .snn-language-selector {
     width: 100%;
-    background: white;
-    color: black;
-    border: none;
-    padding: 14px;
+    background: var(--snn-color-option-bg);
+    color: var(--snn-color-option-text);
+    border: 1px solid var(--snn-color-menu-border);
+    padding: 12px 14px;
     font-size: 16px;
     font-family: ${WIDGET_CONFIG.typography.fontFamily};
-    border-radius: 5px;
+    border-radius: var(--snn-radius-control);
     margin-bottom: 20px;
     cursor: pointer;
     outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 40px;
   }
-  
-  .snn-language-selector:focus {
-    outline: 2px solid ${WIDGET_CONFIG.colors.primary};
+
+  .snn-language-selector:focus-visible {
+    outline: 2px solid var(--snn-color-focus-ring);
     outline-offset: 2px;
   }
-  
+
   .snn-options-grid {
     display: grid;
     grid-template-columns: ${WIDGET_CONFIG.gridLayout.columns};
     gap: ${WIDGET_CONFIG.gridLayout.gap};
     margin-bottom: 20px;
   }
-  
+
   .snn-title {
     margin: 0;
     font-size: ${WIDGET_CONFIG.menu.titleFontSize};
-    color: ${WIDGET_CONFIG.colors.secondary};
+    color: var(--snn-color-on-primary);
     line-height: ${WIDGET_CONFIG.typography.lineHeight} !important;
     margin-left: 5px;
     font-weight: ${WIDGET_CONFIG.typography.titleFontWeight};
     flex: 1;
-    letter-spacing: 1px !important;
-    word-spacing: 2px !important;
+    letter-spacing: 0.5px !important;
     text-align: left;
+  }
+
+  /* Screen-reader-only utility (for aria-live announcements) */
+  .snn-sr-only {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Mobile: < 480px — single column, full-width, larger header buttons */
+  @media (max-width: 480px) {
+    #snn-accessibility-menu {
+      max-width: 100%;
+    }
+    .snn-options-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .snn-content {
+      padding: 16px;
+    }
+    .snn-accessibility-option {
+      min-height: 100px;
+      padding: 8px 4px;
+    }
+  }
+
+  /* Very narrow phones: < 360px — single column */
+  @media (max-width: 360px) {
+    .snn-options-grid {
+      grid-template-columns: 1fr;
+    }
+    .snn-accessibility-option {
+      flex-direction: row;
+      justify-content: flex-start;
+      min-height: 60px;
+      padding: 10px 12px;
+      gap: 12px;
+    }
+    .snn-button-text {
+      text-align: left;
+    }
   }
 `;
 
@@ -2401,24 +2524,47 @@ const pageStyles = `
 // SVG ICONS
 // ===========================================
 
+// Consistent outlined icon set — 24x24 viewBox, 1.5 stroke, currentColor
+// Inspired by Lucide. All icons render via the cascaded `color` property.
+const ICON_ATTRS = 'xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
+
 const icons = {
-  buttonsvg: `<svg xmlns="http://www.w3.org/2000/svg" style="fill:white;" viewBox="0 0 24 24" width="30px" height="30px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M20.5 6c-2.61 0.7-5.67 1-8.5 1s-5.89-0.3-8.5-1L3 8c1.86 0.5 4 0.83 6 1v13h2v-6h2v6h2V9c2-0.17 4.14-0.5 6-1l-0.5-2zM12 6c1.1 0 2-0.9 2-2s-0.9-2-2-2-2 0.9-2 2 0.9 2 2 2z"></path></svg>`,
-  highContrast: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" version="1.2" viewBox="0 0 35 35"><path fill="currentColor" fill-rule="evenodd" d="M1.89998 15.6285c0-7.58203 6.14649-13.72852 13.72852-13.72852 7.5821 0 13.7286 6.14649 13.7286 13.72852 0 0.6081-0.0395 1.2069-0.1161 1.794 0.5933 0.2913 1.1478 0.6497 1.6534 1.0654 0.1725-0.9268 0.2627-1.8825 0.2627-2.8594 0-8.57615-6.9524-15.5285244-15.5286-15.5285244C7.05235 0.0999756 0.0999756 7.05235 0.0999756 15.6285c0 8.5762 6.9523744 15.5286 15.5285244 15.5286 1.2241 0 2.415-0.1416 3.5574-0.4093-0.4388-0.4866-0.8222-1.0242-1.1402-1.6028-0.7847 0.1394-1.5924 0.2121-2.4172 0.2121-7.58203 0-13.72852-6.1465-13.72852-13.7286Z" clip-rule="evenodd"/><path fill="currentColor" fill-rule="evenodd" d="M2.35 15.6286C2.35 8.29502 8.29502 2.35 15.6286 2.35c7.3335 0 13.2785 5.94502 13.2785 13.2786 0 0.5408-0.0323 1.0741-0.0951 1.5979 0.444 0.1881 0.8687 0.4128 1.2703 0.6703 0.1151-0.7392 0.1748-1.4967 0.1748-2.2682C30.2571 7.54943 23.7077 1 15.6286 1 7.54943 1 1 7.54943 1 15.6286c0 8.0791 6.54943 14.6285 14.6286 14.6285 1.0033 0 1.9831-0.101 2.9297-0.2934-0.276-0.3898-0.52-0.8038-0.7282-1.2382-0.716 0.1195-1.4515 0.1816-2.2015 0.1816-7.33358 0-13.2786-5.945-13.2786-13.2785Z" clip-rule="evenodd"/><path fill="currentColor" fill-rule="evenodd" d="M15.6286 1C7.54943 1 1 7.54943 1 15.6286c0 8.0791 6.54943 14.6285 14.6286 14.6285" clip-rule="evenodd"/><path stroke="currentColor" stroke-width="1.8" d="M15.6286 1C7.54943 1 1 7.54943 1 15.6286c0 8.0791 6.54943 14.6285 14.6286 14.6285"/><path fill="currentColor" fill-rule="evenodd" d="M22.8729 25.114c0-1.3811 1.0901-2.5007 2.4359-2.5007 1.3459 0 2.436 1.1196 2.436 2.5007 0 1.38-1.0901 2.4997-2.436 2.4997-1.3458 0-2.4359-1.1197-2.4359-2.4997Zm7.2258-2.0373c-0.0899-0.2248-0.071-0.4785 0.0512-0.6875l0.912-1.5598c0.0898-0.1532 0.0668-0.3504-0.0574-0.4779l-1.0556-1.0832c-0.1232-0.1264-0.3153-0.1511-0.4657-0.0589l-1.5225 0.9374c-0.201 0.1237-0.4495 0.1427-0.667 0.051-0.2181-0.092-0.3797-0.2819-0.4358-0.5118l-0.4329-1.7763c-0.0428-0.1735-0.1953-0.2957-0.3696-0.2957h-1.4931c-0.1744 0-0.3268 0.1222-0.3696 0.2957l-0.433 1.7763c-0.056 0.2299-0.2177 0.4198-0.4357 0.5118-0.2176 0.0917-0.466 0.0727-0.6671-0.051l-1.5225-0.9374c-0.1503-0.0922-0.3424-0.0675-0.4656 0.0589l-1.0556 1.0832c-0.1243 0.1275-0.1473 0.3247-0.0575 0.4779l0.9121 1.5598c0.1222 0.209 0.1411 0.4627 0.0511 0.6875-0.0895 0.2239-0.2806 0.3916-0.5142 0.4514l-1.7165 0.4395c-0.1692 0.0439-0.2882 0.2003-0.2882 0.3803v1.5311c0 0.18 0.119 0.3364 0.2882 0.3804l1.7165 0.4394c0.2336 0.0599 0.4247 0.2276 0.5142 0.4515 0.09 0.2247 0.0711 0.4785-0.0511 0.6874l-0.9121 1.5599c-0.0898 0.1532-0.0668 0.3503 0.0575 0.4778l1.0556 1.0833c0.1232 0.1264 0.3153 0.151 0.4656 0.0589l1.5225-0.9374c0.2011-0.1238 0.4495-0.1428 0.6671-0.051 0.218 0.092 0.3797 0.2818 0.4357 0.5118l0.433 1.7762c0.0428 0.1736 0.1952 0.2968 0.3696 0.2968h1.4931c0.1743 0 0.3268-0.1232 0.3696-0.2968l0.4329-1.7762c0.0561-0.23 0.2177-0.4198 0.4358-0.5118 0.2175-0.0918 0.466-0.0728 0.667 0.051l1.5225 0.9374c0.1504 0.0921 0.3425 0.0675 0.4657-0.0589l1.0556-1.0833c0.1242-0.1275 0.1472-0.3246 0.0574-0.4778l-0.912-1.5599c-0.1222-0.2089-0.1411-0.4627-0.0512-0.6874 0.0896-0.2239 0.2806-0.3916 0.5142-0.4515l1.7166-0.4394c0.1691-0.044 0.2881-0.2004 0.2881-0.3804v-1.5311c0-0.18-0.119-0.3364-0.2881-0.3803l-1.7166-0.4395c-0.2336-0.0598-0.4246-0.2275-0.5142-0.4514Z" clip-rule="evenodd"/></svg>`,
-  biggerText: `<svg xmlns="http://www.w3.org/2000/svg" version="1.2" viewBox="0 0 36 23"><g fill="none" fill-rule="evenodd" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-linejoin="round" d="M26.58 21.3225806V1m-7.92 4.06451613V1H34.5v4.06451613"/><path d="M22.62 21.3225806h7.92"/><path stroke-linejoin="round" d="M6.78 18.6129032V5.06451613M1.5 7.77419355V5.06451613h10.56v2.70967742"/><path d="M4.14 18.6129032h5.28"/></g></svg>`,
-  textSpacing: `<svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 15 15" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.55293 0.999969C4.75295 0.999969 4.93372 1.11917 5.0125 1.30301L8.01106 8.29982C8.11984 8.55363 8.00226 8.84757 7.74844 8.95635C7.49463 9.06512 7.20069 8.94754 7.09191 8.69373L6.11613 6.41685H2.98973L2.01395 8.69373C1.90517 8.94754 1.61123 9.06512 1.35742 8.95635C1.1036 8.84757 0.986023 8.55363 1.0948 8.29982L4.09336 1.30301C4.17214 1.11917 4.35291 0.999969 4.55293 0.999969ZM4.55293 2.76929L5.75186 5.56685H3.354L4.55293 2.76929ZM11.0562 9.00214C11.2617 9.00214 11.4463 8.87633 11.5215 8.68502L14.2733 1.68299C14.3743 1.42598 14.2478 1.13575 13.9908 1.03475C13.7338 0.933747 13.4436 1.06021 13.3426 1.31722L11.0562 7.13514L8.76973 1.31722C8.66873 1.06021 8.3785 0.933747 8.1215 1.03475C7.86449 1.13575 7.73802 1.42598 7.83902 1.68299L10.5908 8.68502C10.666 8.87633 10.8506 9.00214 11.0562 9.00214ZM14.9537 12.4999C14.9537 12.606 14.9115 12.7077 14.8365 12.7828L12.8365 14.7828C12.6803 14.939 12.4271 14.939 12.2708 14.7828C12.1146 14.6265 12.1146 14.3733 12.2708 14.2171L13.588 12.8999H1.51937L2.83653 14.2171C2.99274 14.3733 2.99274 14.6265 2.83653 14.7828C2.68032 14.939 2.42705 14.939 2.27084 14.7828L0.270843 12.7828C0.195828 12.7077 0.153687 12.606 0.153687 12.4999C0.153687 12.3938 0.195828 12.2921 0.270843 12.2171L2.27084 10.2171C2.42705 10.0609 2.68032 10.0609 2.83653 10.2171C2.99274 10.3733 2.99274 10.6265 2.83653 10.7828L1.51937 12.0999L13.588 12.0999L12.2708 10.7828C12.1146 10.6265 12.1146 10.3733 12.2708 10.2171C12.4271 10.0609 12.6803 10.0609 12.8365 10.2171L14.8365 12.2171C14.9115 12.2921 14.9537 12.3938 14.9537 12.4999Z" fill="#000000"/></svg>`,
-  pauseAnimations: `<svg xmlns="http://www.w3.org/2000/svg" version="1.2" viewBox="0 0 37 36"><g fill="none" fill-rule="evenodd"><path fill="currentColor" d="M15.8087111 23.6666667h-1.2702778c-.4429444 0-.8018333-.3598334-.8018333-.8027778v-9.7277778c0-.4429444.3588889-.8027778.8018333-.8027778h1.2702778c.4429445 0 .8027778.3598334.8027778.8027778v9.7277778c0 .4429444-.3598333.8027778-.8027778.8027778m6.6525722 0h-1.2702777c-.442 0-.8018334-.3598334-.8018334-.8027778v-9.7277778c0-.4429444.3598334-.8027778.8018334-.8027778h1.2702777c.4438889 0 .8027778.3598334.8027778.8027778v9.7277778c0 .4429444-.3588889.8027778-.8027778.8027778"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.88888889" d="M18.5 4.77777778V1m0 34v-3.7777778M31.7222222 18H35.5m-34 0h3.77777778m3.87278889-9.34943333L6.47873333 5.97967778M30.5204167 30.0204167l-2.6708889-2.6708889m-.0000945-18.69896113 2.6708889-2.67088889M6.47911111 30.0204167l2.67183333-2.6708889M23.5542889 5.78219444l1.4440555-3.49066666M12.0013722 33.7087556l1.4440556-3.4906667m17.2723778-7.1638 3.4906666 1.4440555M2.79124444 11.5013722l3.49066667 1.4440556m7.15274999-7.15860558L11.9877722 2.2971m13.0246445 31.4061778-1.4468889-3.4897222m7.14765-17.2788945L34.2029 11.4877722M2.79672222 24.5124167l3.48972222-1.4468889"/></g></svg>`,
-  hideImages: `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M32 12C16 12 4 32 4 32s12 20 28 20 28-20 28-20S48 12 32 12zm0 32a12 12 0 1112-12 12 12 0 01-12 12z"/><circle cx="32" cy="32" r="8"/></svg>`,
-  dyslexiaFont: `<svg xmlns="http://www.w3.org/2000/svg" version="1.2" viewBox="0 0 31 22"><path fill="currentColor" fill-rule="evenodd" d="M.5 22V1.0083333h7.2421899c6.8051611 0 11.6124768 4.3388889 11.6124768 10.4805556C19.3546667 17.6305556 14.547351 22 7.7421899 22H.5Zm2.4348742-4.31h4.8073157c5.3692097 0 9.1463863-2.8616703 9.1463863-7.27 0-4.3807776-3.7771766-7.2422222-9.1463863-7.2422222H2.9348742V17.69ZM26.2735913 4.0333333l.0114609 2.1694445h4.0126191V8.25h-4.001719L26.77 22h-3.535416L23.78 8.25h-2.4238344V6.2027778h2.55923l.0751088-2.1694445C24.0706908 1.6805556 25.6007488 0 27.697782 0 28.6896221 0 29.677687.3666667 30.5 1.0083333l-.9627285 1.6805556c-.3479788-.3666667-.9515992-.6416667-1.627768-.6416667-.8819593 0-1.6420082.825-1.6359122 1.9861111Z"/></svg>`,
-  biggerCursor: `<svg xmlns="http://www.w3.org/2000/svg" version="1.2" viewBox="0 0 27 27"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15.9983464 11.5517813 9.5269972 9.52699721-4.4465655 4.44656549-9.5269972-9.52699717-4.05145413 9.06403815L1 1.0000004l24.0623846 6.5003268z"/></svg>`,
-  lineHeight: `<svg xmlns="http://www.w3.org/2000/svg" version="1.2" viewBox="0 0 47 25"><g fill="none" fill-rule="evenodd"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M3.99999962 2.71042226V22.7104223"/><path fill="currentColor" d="m.16814235 20.5270412 3.44487862 4.2104072c.17486379.2137224.48987514.2452235.70359754.0703597a.4999988.4999988 0 0 0 .07035976-.0703597l3.44487862-4.2104072c.17486378-.2137225.14336265-.5287338-.07035976-.7035976-.08933106-.073089-.20119771-.1130213-.31661889-.1130213H.555121c-.27614238 0-.5.2238576-.5.5 0 .1154211.0399323.2272878.11302135.3166189Zm0-161332381L3.61302097.18339592c.17486379-.21372241.48987514-.24522355.70359754-.07035976a.49999975.49999975 0 0 1 .07035976.07035976l3.44487862 4.2104072c.17486378.2137224.14336265.52873375-.07035976.70359754-.08933106.07308905-.20119771.11302135-.31661889.11302135H.555121c-.27614237 0-.5-.22385762-.5-.5 0-.11542118.0399323-.22728783.11302135-.3166189Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.4999996 1.71042226h30m-30 7h30m-30 7.00000004h30m-30 7h24"/></g></svg>`,
-  textAlign: `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M10 16h44v4H10zm0 12h44v4H10zm0 12h44v4H10zm0 12h44v4H10z"/></svg>`,
-  screenReader: `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M16 24 L24 24 L32 16 L32 48 L24 40 L16 40 Z" fill="#333" stroke="#555" stroke-width="2"/><path d="M36 20 C42 24, 42 40, 36 44" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M36 12 C48 24, 48 40, 36 52" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round"/><rect x="28" y="48" width="8" height="8" fill="#ccc"/></svg>`,
-  resetAll: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 17" width="100%" height="100%"><g fill="none" fill-rule="evenodd" stroke="currentColor" stroke-linecap="round" stroke-width="1.84"><path d="M16.20106 8c0 .9667-.189683 1.8872-.5324673 2.7251-.3427843.8372-.8386698 1.5911-1.4517524 2.2246-.6130825.6335-1.3426846 1.1459-2.152902 1.5001-.8108948.3542-1.70172746.5502-2.6372711.5502-.93554365 0-1.8263763-.196-2.63727112-.5502-.81021738-.3542-1.53981948-.8666-2.15290203-1.5001M2.6522744 8c0-.9667.189683-1.8872.53246728-2.7251.34278427-.8372.83866982-1.5911 1.45175237-2.2246.61308255-.6335 1.34268465-1.1459 2.15290203-1.5001C7.6002909 1.196 8.49112355 1 9.4266672 1c.93554364 0 1.8263763.196 2.6372711.5502.8102174.3542 1.5398195.8666 2.152902 1.5001"></path><path stroke-linejoin="round" d="m4.92576062 6.96092-2.48958935 1.484L1 5.87242m13.0125924 2.93832 2.3886509-1.652L18 9.62694"></path></g></svg>`,
-  voiceControl: `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M32 44a12 12 0 0012-12V20a12 12 0 10-24 0v12a12 12 0 0012 12z" fill="#333"/><path d="M20 32h24v4H20z" fill="#555"/><path d="M32 48v8" stroke="#555" stroke-width="4" stroke-linecap="round"/></svg>`,
-  fontSelection: `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text x="32" y="40" font-family="serif" font-size="24" text-anchor="middle" fill="#333">Aa</text><path d="M8 48h48v2H8z"/></svg>`,
-  colorFilter: `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="none" stroke="#333" stroke-width="2"/><path d="M32 8a24 24 0 000 48V8z" fill="#f00" opacity="0.3"/><path d="M32 8a24 24 0 000 48" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="4,2"/></svg>`,
-  saturation: `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="20" cy="32" r="12" fill="#ff0000" opacity="0.7"/><circle cx="32" cy="32" r="12" fill="#00ff00" opacity="0.7"/><circle cx="44" cy="32" r="12" fill="#0000ff" opacity="0.7"/></svg>`,
-  reducedMotion: `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="16" y="24" width="8" height="16" fill="#333"/><rect x="28" y="24" width="8" height="16" fill="#333"/><rect x="40" y="24" width="8" height="16" fill="#333"/></svg>`,
+  // Main FAB — Universal Access symbol (accessibility person)
+  buttonsvg: `<svg ${ICON_ATTRS}><circle cx="12" cy="4" r="1.5"/><path d="M6 8a13 13 0 0 0 12 0"/><path d="M12 6.5v6"/><path d="m9 21 3-8.5 3 8.5"/></svg>`,
+  // Half-filled circle
+  highContrast: `<svg ${ICON_ATTRS}><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg>`,
+  // Two A's of different sizes
+  biggerText: `<svg ${ICON_ATTRS}><path d="m3 18 3-9 3 9"/><path d="M4 15h4"/><path d="m13 18 4-12 4 12"/><path d="M14.5 13.5h5"/></svg>`,
+  // Letter with horizontal expansion arrows
+  textSpacing: `<svg ${ICON_ATTRS}><path d="m3 18 3-9 3 9"/><path d="M4 15h4"/><path d="m15 18 3-9 3 9"/><path d="M16 15h4"/><path d="M10.5 12h3"/><path d="m9 10.5-1.5 1.5L9 13.5"/><path d="m15 10.5 1.5 1.5L15 13.5"/></svg>`,
+  // Pause icon
+  pauseAnimations: `<svg ${ICON_ATTRS}><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>`,
+  // Image with diagonal slash
+  hideImages: `<svg ${ICON_ATTRS}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="m21 15-3.5-3.5L9.5 19.5"/><path d="M3 3l18 18"/></svg>`,
+  // Stylized D (OpenDyslexic-inspired)
+  dyslexiaFont: `<svg ${ICON_ATTRS}><path d="M7 4h4a8 8 0 0 1 0 16H7z"/><path d="M11 8v8"/></svg>`,
+  // Mouse pointer
+  biggerCursor: `<svg ${ICON_ATTRS}><path d="m4 4 7 17 2.5-7.5L21 11z"/></svg>`,
+  // Lines stacked with vertical arrows
+  lineHeight: `<svg ${ICON_ATTRS}><path d="M3 4v16"/><path d="m1 6 2-2 2 2"/><path d="m1 18 2 2 2-2"/><path d="M9 6h12"/><path d="M9 12h12"/><path d="M9 18h12"/></svg>`,
+  // Three justify lines
+  textAlign: `<svg ${ICON_ATTRS}><path d="M3 6h18"/><path d="M3 12h12"/><path d="M3 18h18"/></svg>`,
+  // Speaker with sound waves
+  screenReader: `<svg ${ICON_ATTRS}><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`,
+  // Rotate counter-clockwise
+  resetAll: `<svg ${ICON_ATTRS}><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>`,
+  // Microphone
+  voiceControl: `<svg ${ICON_ATTRS}><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/><path d="M8 22h8"/></svg>`,
+  // Aa (case sensitive) — large A and lowercase a
+  fontSelection: `<svg ${ICON_ATTRS}><path d="m3 18 3-9 3 9"/><path d="M4 15h4"/><circle cx="16.5" cy="15.5" r="3.5"/><path d="M20 12v7"/></svg>`,
+  // Droplet
+  colorFilter: `<svg ${ICON_ATTRS}><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5S12.5 6 12 3.5C11.5 6 9 8 7 9.5S5 13 5 15a7 7 0 0 0 7 7z"/></svg>`,
+  // Three overlapping circles (color mixing)
+  saturation: `<svg ${ICON_ATTRS}><circle cx="9" cy="10" r="5"/><circle cx="15" cy="10" r="5"/><circle cx="12" cy="15" r="5"/></svg>`,
+  // Wave with slash (reduced motion)
+  reducedMotion: `<svg ${ICON_ATTRS}><path d="M3 12c1.5-3 3-3 4.5 0s3 3 4.5 0 3-3 4.5 0 3 3 4.5 0"/><path d="M4 20 20 4"/></svg>`,
+  // Close X
+  close: `<svg ${ICON_ATTRS}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
 };
 
 // ===========================================
@@ -2800,6 +2946,8 @@ function resetAccessibilitySettings() {
     const steps = button.querySelectorAll('.snn-option-step');
     steps.forEach(step => step.classList.remove('active'));
   });
+
+  announce(getTranslation('resetAllSettings'));
 }
 
 // Create toggle buttons for accessibility options
@@ -2877,6 +3025,8 @@ function createToggleButton(
         targetElement.classList.remove(className);
       }
     }
+
+    announce(`${buttonText}: ${newIsActive ? 'on' : 'off'}`);
   }
 
   return button;
@@ -2916,6 +3066,7 @@ function createActionButton(buttonText, actionFunction, iconSVG, optionsConfig =
     const result = actionFunction();
     if (result) {
       updateActionButtonStatus(button, optionId, optionsConfig);
+      announce(`${buttonText}: ${result}`);
     }
   });
 
@@ -2925,6 +3076,7 @@ function createActionButton(buttonText, actionFunction, iconSVG, optionsConfig =
       const result = actionFunction();
       if (result) {
         updateActionButtonStatus(button, optionId, optionsConfig);
+        announce(`${buttonText}: ${result}`);
       }
     }
   });
@@ -3588,14 +3740,14 @@ function createAccessibilityMenu() {
   // Create reset button
   const resetButton = document.createElement('button');
   resetButton.classList.add('snn-reset-button');
-  resetButton.innerHTML = `${icons.resetAll}<span class="snn-tooltip">${getTranslation('reset')}</span>`;
+  resetButton.innerHTML = `${icons.resetAll}<span class="snn-tooltip" role="tooltip">${getTranslation('reset')}</span>`;
   resetButton.setAttribute('aria-label', getTranslation('resetAllSettings'));
   resetButton.addEventListener('click', resetAccessibilitySettings);
 
   // Create close button
   const closeButton = document.createElement('button');
   closeButton.className = 'snn-close';
-  closeButton.innerHTML = `<span class="snn-tooltip">${getTranslation('close')}</span>`;
+  closeButton.innerHTML = `${icons.close}<span class="snn-tooltip" role="tooltip">${getTranslation('close')}</span>`;
   closeButton.setAttribute('aria-label', getTranslation('closeAccessibilityMenu'));
 
   closeButton.addEventListener('click', function () {
@@ -3884,7 +4036,7 @@ function updateMenuLanguage() {
   const menu = shadowRoot.getElementById('snn-accessibility-menu');
   if (!menu) return;
 
-  const wasOpen = menu.style.display === 'block';
+  const wasOpen = menu.classList.contains('snn-open');
 
   // Remove old menu
   menu.remove();
@@ -3926,10 +4078,53 @@ const menuCache = {
   }
 };
 
+// Apply `inert` to every body child except the widget container, trapping focus.
+const inertState = { applied: [] };
+
+function setBackgroundInert(enabled) {
+  if (enabled) {
+    inertState.applied = [];
+    Array.from(document.body.children).forEach((el) => {
+      if (el.id === 'snn-accessibility-widget-container') return;
+      if (!el.hasAttribute('inert')) {
+        el.setAttribute('inert', '');
+        el.setAttribute('aria-hidden', 'true');
+        inertState.applied.push(el);
+      }
+    });
+  } else {
+    inertState.applied.forEach((el) => {
+      el.removeAttribute('inert');
+      el.removeAttribute('aria-hidden');
+    });
+    inertState.applied = [];
+  }
+}
+
+// Live region for state announcements (created lazily in main document).
+let announcerEl = null;
+function announce(message) {
+  if (!message) return;
+  if (!announcerEl) {
+    announcerEl = document.createElement('div');
+    announcerEl.setAttribute('role', 'status');
+    announcerEl.setAttribute('aria-live', 'polite');
+    announcerEl.setAttribute('aria-atomic', 'true');
+    announcerEl.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;';
+    document.body.appendChild(announcerEl);
+  }
+  announcerEl.textContent = '';
+  // Force re-announcement by toggling text after a frame.
+  requestAnimationFrame(() => {
+    announcerEl.textContent = message;
+  });
+}
+
 // Menu control functions (optimized)
 function toggleMenu() {
   if (!menuCache.menu) menuCache.init();
-  const isOpen = menuCache.menu.style.display === 'block';
+  if (!menuCache.menu) return;
+  const isOpen = menuCache.menu.classList.contains('snn-open');
 
   if (isOpen) {
     closeMenu();
@@ -3940,10 +4135,23 @@ function toggleMenu() {
 
 function openMenu() {
   if (!menuCache.menu) menuCache.init();
+  if (!menuCache.menu) return;
+
   menuCache.menu.style.display = 'block';
   menuCache.menu.setAttribute('aria-hidden', 'false');
 
-  // UPDATED: Now focuses on the first tool button instead of the Close button
+  // Lock background scroll on mobile while menu is open
+  document.documentElement.style.overflow = 'hidden';
+
+  // Trap focus in widget by marking background as inert
+  setBackgroundInert(true);
+
+  // Trigger slide-in animation on next frame so display:block has applied
+  requestAnimationFrame(() => {
+    menuCache.menu.classList.add('snn-open');
+  });
+
+  // Focus first option
   const firstOption = menuCache.menu.querySelector('.snn-accessibility-option');
   if (firstOption) {
     firstOption.focus();
@@ -3951,20 +4159,39 @@ function openMenu() {
     menuCache.closeButton.focus();
   }
 
-  // Add keyboard navigation
+  // Add keyboard navigation (guard against double-binding)
+  document.removeEventListener('keydown', handleMenuKeyboard);
   document.addEventListener('keydown', handleMenuKeyboard);
 }
 
 function closeMenu() {
   if (!menuCache.menu) menuCache.init();
-  menuCache.menu.style.display = 'none';
+  if (!menuCache.menu) return;
+
+  menuCache.menu.classList.remove('snn-open');
   menuCache.menu.setAttribute('aria-hidden', 'true');
+
+  document.documentElement.style.overflow = '';
+  setBackgroundInert(false);
+
+  // After the slide-out transition, hide the menu so it leaves the a11y tree
+  const onTransitionEnd = (e) => {
+    if (e.propertyName !== 'transform') return;
+    menuCache.menu.style.display = 'none';
+    menuCache.menu.removeEventListener('transitionend', onTransitionEnd);
+  };
+  menuCache.menu.addEventListener('transitionend', onTransitionEnd);
+  // Fallback for users with prefers-reduced-motion (transition is ~0ms)
+  setTimeout(() => {
+    if (!menuCache.menu.classList.contains('snn-open')) {
+      menuCache.menu.style.display = 'none';
+    }
+  }, 320);
 
   if (menuCache.button) {
     menuCache.button.focus();
   }
 
-  // Remove keyboard navigation
   document.removeEventListener('keydown', handleMenuKeyboard);
 }
 
@@ -3988,7 +4215,7 @@ let keyboardCache = {
 };
 
 function handleMenuKeyboard(e) {
-  if (!menuCache.menu || menuCache.menu.style.display !== 'block') return;
+  if (!menuCache.menu || !menuCache.menu.classList.contains('snn-open')) return;
 
   if (e.key === 'Escape') {
     e.preventDefault();
@@ -3997,19 +4224,23 @@ function handleMenuKeyboard(e) {
   }
 
   const elements = keyboardCache.getFocusableElements();
-  if (!elements) return;
+  if (!elements || !elements.all.length) return;
+
+  // Inside a Shadow DOM, document.activeElement returns the shadow HOST,
+  // not the focused element. shadowRoot.activeElement gives the real one.
+  const active = shadowRoot.activeElement || document.activeElement;
 
   if (e.key === 'Tab') {
     const firstElement = elements.all[0];
     const lastElement = elements.all[elements.all.length - 1];
 
     if (e.shiftKey) {
-      if (document.activeElement === firstElement) {
+      if (active === firstElement) {
         e.preventDefault();
         lastElement.focus();
       }
     } else {
-      if (document.activeElement === lastElement) {
+      if (active === lastElement) {
         e.preventDefault();
         firstElement.focus();
       }
@@ -4018,13 +4249,13 @@ function handleMenuKeyboard(e) {
 
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
     e.preventDefault();
-    const currentIndex = elements.options.indexOf(shadowRoot.activeElement);
+    const currentIndex = elements.options.indexOf(active);
     let nextIndex;
 
     if (e.key === 'ArrowDown') {
-      nextIndex = currentIndex === elements.options.length - 1 ? 0 : currentIndex + 1;
+      nextIndex = currentIndex >= elements.options.length - 1 ? 0 : currentIndex + 1;
     } else {
-      nextIndex = currentIndex === 0 ? elements.options.length - 1 : currentIndex - 1;
+      nextIndex = currentIndex <= 0 ? elements.options.length - 1 : currentIndex - 1;
     }
 
     elements.options[nextIndex].focus();
